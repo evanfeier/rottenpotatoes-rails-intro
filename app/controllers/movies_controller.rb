@@ -12,16 +12,28 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.pluck(:rating).uniq
-    @chosen_ratings = @all_ratings
+
+    @sortby = params[:sortby] ? params[:sortby] : session[:sort]
+    @ratings = params[:ratings] ? params[:ratings] : session[:ratings]
     
-    if params[:sortby]
-      @movies = Movie.order(params[:sortby])
-    elsif params[:ratings]
-      @chosen_ratings = params[:ratings].keys
-      @movies = Movie.where(rating: @chosen_ratings)
+    if @ratings == nil
+      @ratings = {}
+      @all_ratings.each{|i| @ratings[i] = 1}
+    end
+    
+    if @sortby and @ratings
+      @movies = Movie.where(rating: @ratings.keys).order(@sortby)
+    elsif @sortby
+      @movies = Movie.order(@sortby)
+    elsif @ratings
+      @movies = Movie.where(:rating => @ratings.keys)
     else
       @movies = Movie.all
     end
+    
+    session[:sort] = @sortby
+    session[:ratings] = @ratings
+    
   end
 
   def new
