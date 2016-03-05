@@ -14,19 +14,13 @@ class MoviesController < ApplicationController
     @all_ratings = Movie.pluck(:rating).uniq
     @chosen_ratings = @all_ratings
     
-    if params[:id] == 'title_header'
-      @movies = Movie.order(:title)
-      @title_hilite = 'hilite'
-    elsif params[:id] == 'release_date_header'
-      @movies = Movie.order(:release_date)
-      @release_date_hilite = 'hilite'
+    if params[:sortby]
+      @movies = Movie.order(params[:sortby])
     elsif params[:ratings]
       @chosen_ratings = params[:ratings].keys
       @movies = Movie.where(rating: @chosen_ratings)
     else
       @movies = Movie.all
-      @title_hilite = ''
-      @release_date_hilite = ''
     end
   end
 
